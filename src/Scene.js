@@ -1,32 +1,29 @@
 import React, { Suspense, useEffect, useState, useMemo, useRef } from "react"
-import * as THREE from 'three'
-import { Canvas, useFrame, useThree, useLoader } from "react-three-fiber"
+import { useThree } from "react-three-fiber"
 import {
   Physics,
-  useBox,
-  useSphere,
   usePlane,
-  useCompoundBody,
 } from 'use-cannon'
-import throttle from 'lodash.throttle'
+
 import Rake from './rake'
 
-function threeVector(vec) {
-  return new THREE.Vector3(vec[0], vec[1], vec[2]);
+function randomInteger(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-
 function Plane(props) {
+  const SIZE = 24
+
   const [ref] = usePlane(() => ({ type: 'Static', ...props }))
   return (
     <group ref={ref}>
-      <mesh>
-        <planeBufferGeometry attach="geometry" args={[8, 8]} />
-        <meshBasicMaterial attach="material" color="#ffb385" />
-      </mesh>
+      {/* <mesh>
+        <planeBufferGeometry attach="geometry" args={[SIZE, SIZE]} />
+        <meshBasicMaterial attach="material" color="#ffffff" />
+      </mesh> */}
       <mesh receiveShadow>
-        <planeBufferGeometry attach="geometry" args={[8, 8]} />
-        <shadowMaterial attach="material" color="lightsalmon" />
+        <planeBufferGeometry attach="geometry" args={[SIZE, SIZE]} />
+        <shadowMaterial attach="material" color="lightsteelblue" />
       </mesh>
     </group>
   )
@@ -34,69 +31,6 @@ function Plane(props) {
 
 
 
-function CompoundBody(props) {
-  const [hovered, setHover] = useState(false)
-  const { viewport } = useThree()
-
-  const handle = [0.15, 4.35, 0.15]
-  const handlePosition = [0, 0, 0]
-
-  const teethDimensions = [1.75, 0.05, 0.42]
-  const teethPosition = [0, 2.1, -0.11]
-
-  const [ref, api] = useCompoundBody(() => ({
-    mass: 14.5,
-    ...props,
-    shapes: [
-      { type: 'Box', position: handlePosition, rotation: [0, 0, 0], args: handle },
-      { type: 'Box', position: teethPosition, rotation: [0, 0, 0], args: teethDimensions },
-    ],
-  }))
-
-  
-  const rotationRef = useRef([0, 0, 0])
-  useEffect(() => api.rotation.subscribe((v) => (rotationRef.current = v)), [])
-
-  const refClock = useRef(new Date().getTime())
-  const WAIT = 1000
-
-  useEffect(() => {
-
-    if (hovered) {
-
-      if (refClock.current + WAIT < new Date().getTime()) {
-
-        api.applyLocalImpulse(
-          [0, 0, rotationRef.current[0] < 0 ? 100 : -100],
-          [0, -2, 0],
-        )
-        refClock.current = new Date().getTime()
-      }
-    }
-
-  }, [hovered, api])
-
-  return (
-    <group
-      ref={ref}
-      onPointerOver={e => setHover(true)}
-      onPointerOut={e => setHover(false)}
-    >
-      <Suspense fallback={null}>
-        <Rake />
-      </Suspense>
-
-      <mesh castShadow dispose={null}>
-        <boxBufferGeometry attach="geometry" args={handle} />
-        <meshNormalMaterial attach="material" transparent opacity={0.3} />
-      </mesh>
-      <mesh castShadow position={teethPosition} dispose={null}>
-        <boxBufferGeometry attach="geometry" args={teethDimensions} />
-        <meshNormalMaterial attach="material" />
-      </mesh>
-    </group>
-  )
-}
 
 // function InstancedObjects({ count = 20 }) {
 
@@ -131,19 +65,62 @@ function CompoundBody(props) {
 
 function Scene() {
 
+  const rakeCount = 5
+  const { viewport } = useThree()
+
+  const rotations = [
+    0,
+    -Math.PI / 2,
+    Math.PI / 2,
+    Math.PI / 3,
+
+    -Math.PI / 3,
+    -Math.PI / 4,
+    Math.PI / 4,
+  ]
+  
+
+  const ratio = window.innerWidth / window.innerHeight
+
+  
   return (
     <>
       <Physics
         // iterations={10}
-        gravity={[0, -25, 0]}
+        gravity={[0, -40, 0]}
         allowSleep={false}
         iterations={6}
         step={1 / 60}
       // size={10}
       >
-        {/* <Cube /> */}
-        {/* <InstancedObjects /> */}
-        <CompoundBody position={[1.5, 1, 0.5]} rotation={[1.25, 0, 0]} />
+
+        <Suspense fallback={null}>
+
+        {[...Array(rakeCount)].map((_, i) => {
+
+          return [...Array(rakeCount)].map((_, j) => {
+
+            return <Rake 
+              key={`${i}${j}`}
+              position={[
+                (i * 4) + (viewport.height * -0.666) + randomInteger(-2, 2),
+                randomInteger(0.1, 4),
+                (j * 4) + (viewport.height * -0.666) + randomInteger(-2, 2),
+              ]}
+              rotation={[
+                1.25,
+                0,
+                rotations[Math.floor(Math.random() * rotations.length)],
+              ]}
+            />
+          })
+          
+        }
+
+        )}
+
+        </Suspense>
+
 
         <Plane rotation={[-Math.PI / 2, 0, 0]} />
 

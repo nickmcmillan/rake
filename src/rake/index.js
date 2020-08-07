@@ -6,22 +6,106 @@ source: https://sketchfab.com/3d-models/cartoon-rake-low-poly-e768b8fdddfe48b8b1
 title: cartoon rake low poly
 */
 
-import React, { useRef } from 'react'
+import React, { Suspense, useRef, useState, useEffect, } from 'react'
 import { useLoader } from 'react-three-fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import {
+  useCompoundBody,
+} from 'use-cannon'
 
 import glb from './out.glb'
 
-export default function Model(props) {
+function randomInteger(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
+function Model({ onPointerOver, onPointerOut }) {
   const group = useRef()
   const { nodes, materials } = useLoader(GLTFLoader, glb)
   return (
-    <group ref={group} {...props} dispose={null}>
+    <group ref={group} dispose={null}>
       <group position={[0, -2.2, 0]} rotation={[-Math.PI / 2, 0, -Math.PI]} scale={[0.5, 0.5, 0.5]}>
-        <mesh material={materials.grb1} geometry={nodes.mesh_0.geometry} />
-        <mesh material={materials.grb2} geometry={nodes.mesh_1.geometry} />
-        <mesh material={materials.grb3} geometry={nodes.mesh_2.geometry} />
+        <mesh
+          material={materials.grb1}
+          geometry={nodes.mesh_0.geometry}
+          // onPointerOver={onPointerOver}
+          // onPointerOut={onPointerOut}
+          castShadow receiveShadow
+        />
+        <mesh material={materials.grb2} geometry={nodes.mesh_1.geometry} castShadow receiveShadow />
+        <mesh material={materials.grb3} geometry={nodes.mesh_2.geometry} castShadow receiveShadow />
       </group>
+    </group>
+  )
+}
+
+
+export default function RakeComponent(props) {
+  const [hovered, setHover] = useState(false)
+
+  const handle = [0.15, 4.35, 0.15]
+  const handlePosition = [0, 0, 0]
+
+  const teethDimensions = [1.75, 0.05, 0.42]
+  const teethPosition = [0, 2.1, -0.11]
+
+  const [ref, api] = useCompoundBody(() => ({
+    mass: 20,
+    ...props,
+    shapes: [
+      { type: 'Box', position: handlePosition, rotation: [0, 0, 0], args: handle },
+      { type: 'Box', position: teethPosition, rotation: [0, 0, 0], args: teethDimensions },
+    ],
+    angularVelocity: [randomInteger(0, 3), 0, randomInteger(0, 3)]
+  }))
+
+
+  const rotationRef = useRef([0, 0, 0])
+  useEffect(() => api.rotation.subscribe((v) => (rotationRef.current = v)), [])
+
+  const refClock = useRef(new Date().getTime())
+  const WAIT = 1000
+
+  useEffect(() => {
+
+    if (hovered) {
+
+      if (refClock.current + WAIT < new Date().getTime()) {
+
+        const randomX = randomInteger(-10, 10) / 50
+        
+        const randomZ = randomInteger(200, 240)
+        
+
+        api.applyLocalImpulse(
+          [0, 0, rotationRef.current[0] < 0 ? randomZ : -randomZ],
+          [randomX, -1, 0],
+        )
+        refClock.current = new Date().getTime()
+      }
+    }
+
+  }, [hovered, api])
+
+  return (
+    <group
+      ref={ref}
+      onPointerOver={() => setHover(true)}
+      onPointerOut={() => setHover(false)}
+    >
+      <Suspense fallback={null}>
+        <Model />
+      </Suspense>
+
+      {/* <mesh castShadow dispose={null}>
+        <boxBufferGeometry attach="geometry" args={handle} />
+        <meshNormalMaterial attach="material" transparent opacity={0.3} />
+      </mesh>
+      <mesh castShadow position={teethPosition} dispose={null}>
+        <boxBufferGeometry attach="geometry" args={teethDimensions} />
+        <meshNormalMaterial attach="material" />
+      </mesh> */}
     </group>
   )
 }
