@@ -7,13 +7,12 @@ title: cartoon rake low poly
 */
 
 import React, { Suspense, useRef, useState, useEffect, } from 'react'
-import { useLoader } from 'react-three-fiber'
+import { useLoader, useFrame } from 'react-three-fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import {
-  useCompoundBody,
-} from 'use-cannon'
+import { useCompoundBody } from 'use-cannon'
 
 import glb from './out.glb'
+
 
 function randomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -40,7 +39,8 @@ function Model() {
 
 const WAIT = 100
 
-export default function RakeComponent(props) {
+export default function RakeComponent({ position, rotation, onWhack, onWhackRest}) {
+
   const [hovered, setHover] = useState(false)
 
   const handle = [0.15, 4.35, 0.15]
@@ -52,7 +52,8 @@ export default function RakeComponent(props) {
 
   const [ref, api] = useCompoundBody(() => ({
     mass: 15,
-    ...props,
+    position, 
+    rotation,
     shapes: [
       { type: 'Box', position: handlePosition, rotation: [0, 0, 0], args: handle },
       { type: 'Box', position: teethPosition, rotation: [0, 0, 0], args: teethDimensions },
@@ -64,14 +65,14 @@ export default function RakeComponent(props) {
   const rotationRef = useRef([0, 0, 0])
   useEffect(() => api.rotation.subscribe((v) => (rotationRef.current = v)), [])
 
-  const refClock = useRef(new Date().getTime())
-  
+  const hitClockRef = useRef(new Date().getTime())
 
   useEffect(() => {
 
     if (hovered) {
 
-      if (refClock.current + WAIT < new Date().getTime()) {
+      if (hitClockRef.current + WAIT < new Date().getTime()) {
+        onWhack()
 
         const randomX = randomInteger(-10, 10) / 50
         const randomZ = 180 //randomInteger(150, 200)
@@ -80,11 +81,24 @@ export default function RakeComponent(props) {
           [0, 0, rotationRef.current[0] < 0 ? randomZ : -randomZ],
           [randomX, -1, 0],
         )
-        refClock.current = new Date().getTime()
+        hitClockRef.current = new Date().getTime()
       }
     }
 
-  }, [hovered, api])
+  }, [hovered, api, onWhack])
+
+  const isUpright = useRef(false)
+
+  useFrame(() => {
+    if (Math.abs(rotationRef.current[0]) > 1.75) {
+      isUpright.current = true
+    } else {
+      if (isUpright.current) {
+        onWhackRest()
+      }
+      isUpright.current = false
+    }
+  })
 
   return (
     <group ref={ref}>

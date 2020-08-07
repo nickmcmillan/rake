@@ -4,8 +4,12 @@ import {
   Physics,
   usePlane,
 } from 'use-cannon'
+import useSound from 'use-sound'
 
 import Rake from './rake'
+import whack from './audio/mp3/whack.mp3'
+import bob from './audio/mp3/bob.mp3'
+import drop from './audio/mp3/drop.mp3'
 
 function randomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -76,26 +80,43 @@ function Scene() {
     Math.PI / 3,
   ]
 
+  const [playWhack] = useSound(whack, { interrupt: true });
+  const [playBob] = useSound(bob, { interrupt: true })
+  const [playDrop, { isPlaying }] = useSound(drop, { interrupt: true })
+
+  const readyForBobSound = useRef(false)
+  const soundClock = useRef(new Date().getTime())
+
+  useEffect(() => {
+    if (!isPlaying && readyForBobSound.current) {
+      if (soundClock.current + 3000 < new Date().getTime()) {
+        playBob()
+        soundClock.current = new Date().getTime()
+      }
+    }
+    
+    // otherwise it plays on load
+    setTimeout(() => {
+      readyForBobSound.current = true
+    }, 4000)
+
+    
+  }, [isPlaying, playBob])
 
   return (
-    <>
-      <Physics
-        // iterations={10}
-        gravity={[0, -40, 0]}
-        allowSleep={false}
-        iterations={6}
-        step={1 / 40}
-        size={rakeCount * rakeCount + 1}
-      >
+    <Physics
+      gravity={[0, -40, 0]}
+      // allowSleep={false}
+      iterations={6}
+      step={1 / 40}
+      size={rakeCount * rakeCount + 1}
+    >
 
-        <Suspense fallback={null}>
+      <Suspense fallback={null}>
 
         {[...Array(rakeCount)].map((_, i) => {
 
           return [...Array(rakeCount)].map((_, j) => {
-
-            console.log('uh')
-            
 
             return <Rake 
               key={`${i}${j}`}
@@ -109,20 +130,20 @@ function Scene() {
                 0,
                 rotations[Math.floor(Math.random() * rotations.length)],
               ]}
+              onWhack={playWhack}
+              onWhackRest={playDrop}
             />
           })
           
-        }
+        })}
 
-        )}
+      </Suspense>
 
-        </Suspense>
+      <Plane rotation={[-Math.PI / 2, 0, 0]} />
 
-        <Plane rotation={[-Math.PI / 2, 0, 0]} />
+    </Physics>
 
-      </Physics>
-    </>
-  );
+  )
 }
 
-export default Scene;
+export default Scene

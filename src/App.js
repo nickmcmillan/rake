@@ -28,7 +28,7 @@ function App() {
         near: -40,
         far: 400,
         position: [40, 70, 80],
-        zoom: 60,
+        zoom: 55,
       }}
       resize={{ scroll: false }}
     >
