@@ -12,7 +12,7 @@ function randomInteger(min, max) {
 }
 
 function Plane(props) {
-  const SIZE = 24
+  const SIZE = 32
 
   const [ref] = usePlane(() => ({ type: 'Static', ...props }))
   return (
@@ -84,7 +84,7 @@ function Scene() {
         gravity={[0, -40, 0]}
         allowSleep={false}
         iterations={6}
-        step={1 / 60}
+        step={1 / 40}
         size={rakeCount * rakeCount + 1}
       >
 

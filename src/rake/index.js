@@ -74,7 +74,7 @@ export default function RakeComponent(props) {
       if (refClock.current + WAIT < new Date().getTime()) {
 
         const randomX = randomInteger(-10, 10) / 50
-        const randomZ = randomInteger(150, 200)
+        const randomZ = 180 //randomInteger(150, 200)
 
         api.applyLocalImpulse(
           [0, 0, rotationRef.current[0] < 0 ? randomZ : -randomZ],
