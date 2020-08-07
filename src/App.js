@@ -25,14 +25,10 @@ function App() {
       }}
       orthographic
       camera={{
-        near: -16,
-        far: 40,
-        position: [-1, 1, -1],
-        left: 40,
-        right: 40,
-        bottom: 40,
-        top: 40,
-        zoom: 55,
+        near: -40,
+        far: 400,
+        position: [40, 70, 80],
+        zoom: 60,
       }}
       resize={{ scroll: false }}
     >
@@ -50,23 +46,23 @@ function App() {
         shadow-camera-top={10}
         shadow-camera-bottom={-10}
       />
-      <pointLight position={[-10, 0, -20]} color="#fff" intensity={0.5} />
+      <pointLight position={[-10, 0, -20]} color="#fff" intensity={0.025} />
 
       <color attach="background" args={["#fff"]} />
-      {/* <fog color="blue" attach="fog" near={8} far={30} /> */}
 
+      {/* <fog color="#fff" attach="fog" near={100} far={300} /> */}
 
       <Scene />
       
       <Effects />
       <OrbitControls
-        enableZoom={false}
         enableDamping
         // dampingFactor={0.1}
+        // enableZoom={false}
+        maxZoom={100}
+        minZoom={40}
         enableRotate
         enablePan={false}
-        // maxDistance={100}
-        // minDistance={5}
         minPolarAngle={Math.PI / 4}
         maxPolarAngle={Math.PI / 3}
       />

@@ -20,7 +20,7 @@ function randomInteger(min, max) {
 }
 
 
-function Model({ onPointerOver, onPointerOut }) {
+function Model() {
   const group = useRef()
   const { nodes, materials } = useLoader(GLTFLoader, glb)
   return (
@@ -29,8 +29,6 @@ function Model({ onPointerOver, onPointerOut }) {
         <mesh
           material={materials.grb1}
           geometry={nodes.mesh_0.geometry}
-          // onPointerOver={onPointerOver}
-          // onPointerOut={onPointerOut}
           castShadow receiveShadow
         />
         <mesh material={materials.grb2} geometry={nodes.mesh_1.geometry} castShadow receiveShadow />
@@ -40,6 +38,7 @@ function Model({ onPointerOver, onPointerOut }) {
   )
 }
 
+const WAIT = 100
 
 export default function RakeComponent(props) {
   const [hovered, setHover] = useState(false)
@@ -48,10 +47,11 @@ export default function RakeComponent(props) {
   const handlePosition = [0, 0, 0]
 
   const teethDimensions = [1.75, 0.05, 0.42]
+  const hitDimensions = [2.5, 0.5, 0.8]
   const teethPosition = [0, 2.1, -0.11]
 
   const [ref, api] = useCompoundBody(() => ({
-    mass: 20,
+    mass: 15,
     ...props,
     shapes: [
       { type: 'Box', position: handlePosition, rotation: [0, 0, 0], args: handle },
@@ -65,7 +65,7 @@ export default function RakeComponent(props) {
   useEffect(() => api.rotation.subscribe((v) => (rotationRef.current = v)), [])
 
   const refClock = useRef(new Date().getTime())
-  const WAIT = 1000
+  
 
   useEffect(() => {
 
@@ -74,9 +74,7 @@ export default function RakeComponent(props) {
       if (refClock.current + WAIT < new Date().getTime()) {
 
         const randomX = randomInteger(-10, 10) / 50
-        
-        const randomZ = randomInteger(200, 240)
-        
+        const randomZ = randomInteger(150, 200)
 
         api.applyLocalImpulse(
           [0, 0, rotationRef.current[0] < 0 ? randomZ : -randomZ],
@@ -89,11 +87,7 @@ export default function RakeComponent(props) {
   }, [hovered, api])
 
   return (
-    <group
-      ref={ref}
-      onPointerOver={() => setHover(true)}
-      onPointerOut={() => setHover(false)}
-    >
+    <group ref={ref}>
       <Suspense fallback={null}>
         <Model />
       </Suspense>
@@ -106,6 +100,17 @@ export default function RakeComponent(props) {
         <boxBufferGeometry attach="geometry" args={teethDimensions} />
         <meshNormalMaterial attach="material" />
       </mesh> */}
+      
+      <mesh
+        position={teethPosition}
+        dispose={null}
+        onPointerOver={() => setHover(true)}
+        onPointerOut={() => setHover(false)}
+        visible={false}
+      >
+        <boxBufferGeometry attach="geometry" args={hitDimensions} />
+        <meshNormalMaterial attach="material" />
+      </mesh>
     </group>
   )
 }

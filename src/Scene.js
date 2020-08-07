@@ -72,17 +72,11 @@ function Scene() {
     0,
     -Math.PI / 2,
     Math.PI / 2,
-    Math.PI / 3,
-
     -Math.PI / 3,
-    -Math.PI / 4,
-    Math.PI / 4,
+    Math.PI / 3,
   ]
-  
 
-  const ratio = window.innerWidth / window.innerHeight
 
-  
   return (
     <>
       <Physics
@@ -91,7 +85,7 @@ function Scene() {
         allowSleep={false}
         iterations={6}
         step={1 / 60}
-      // size={10}
+        size={rakeCount * rakeCount + 1}
       >
 
         <Suspense fallback={null}>
@@ -100,12 +94,15 @@ function Scene() {
 
           return [...Array(rakeCount)].map((_, j) => {
 
+            console.log('uh')
+            
+
             return <Rake 
               key={`${i}${j}`}
               position={[
-                (i * 4) + (viewport.height * -0.666) + randomInteger(-2, 2),
+                (i * 4) + (viewport.height * -0.666) + randomInteger(-3, 2),
                 randomInteger(0.1, 4),
-                (j * 4) + (viewport.height * -0.666) + randomInteger(-2, 2),
+                (j * 4) + (viewport.height * -0.666) + randomInteger(-3, 2),
               ]}
               rotation={[
                 1.25,
@@ -121,13 +118,9 @@ function Scene() {
 
         </Suspense>
 
-
         <Plane rotation={[-Math.PI / 2, 0, 0]} />
 
       </Physics>
-      {/* <Suspense fallback={null}>
-        <Rake />
-      </Suspense> */}
     </>
   );
 }
