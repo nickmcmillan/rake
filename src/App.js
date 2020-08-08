@@ -1,7 +1,7 @@
-import React, { useRef, useState, Suspense } from "react";
-import { Canvas, useFrame } from "react-three-fiber";
+import React, { useState } from "react";
+import { Canvas } from "react-three-fiber";
 import { OrbitControls, softShadows } from "drei";
-import Effects from "./Effects";
+// import Effects from "./Effects";
 import Scene from "./Scene";
 
 // Inject soft shadow shader
@@ -25,7 +25,7 @@ function App() {
           alpha: false,
           antialias: false,
           stencil: false,
-          depth: false,
+          // depth: false,
         }}
         orthographic
         camera={{
@@ -58,7 +58,7 @@ function App() {
 
         <Scene soundEnabled={soundEnabled} />
         
-        <Effects />
+        {/* <Effects /> */}
         <OrbitControls
           enableDamping
           // dampingFactor={0.1}

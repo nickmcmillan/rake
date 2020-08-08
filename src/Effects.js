@@ -1,13 +1,13 @@
 import React, { Suspense } from "react";
 import {
   EffectComposer,
-  // DepthOfField,
-  // Bloom,
+  DepthOfField,
+  Bloom,
   Noise,
-  // Vignette,
-  // ColorAverage,
-  // Grid,
-  // DotScreen,
+  Vignette,
+  ColorAverage,
+  Grid,
+  DotScreen,
 } from "react-postprocessing";
 import { BlendFunction } from 'postprocessing'
 
