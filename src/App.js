@@ -32,7 +32,7 @@ function App() {
           near: -40,
           far: 400,
           position: [40, 70, 80],
-          zoom: 55,
+          zoom: window.innerWidth > 768 ? 55 : 40,
         }}
         resize={{ scroll: false }}
       >

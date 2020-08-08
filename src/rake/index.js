@@ -121,6 +121,8 @@ export default function RakeComponent({ position, rotation, onWhack, onWhackRest
         dispose={null}
         onPointerOver={() => setHover(true)}
         onPointerOut={() => setHover(false)}
+        onPointerDown={() => setHover(true)}
+        onPointerUp={() => setHover(true)}
         visible={false}
       >
         <boxBufferGeometry attach="geometry" args={hitDimensions} />
