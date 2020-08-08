@@ -67,7 +67,7 @@ function Plane(props) {
 // }
 
 
-function Scene() {
+function Scene({ soundEnabled }) {
 
   const rakeCount = 5
   const { viewport } = useThree()
@@ -80,9 +80,9 @@ function Scene() {
     Math.PI / 3,
   ]
 
-  const [playWhack] = useSound(whack, { interrupt: true });
-  const [playBob] = useSound(bob, { interrupt: true })
-  const [playDrop, { isPlaying }] = useSound(drop, { interrupt: true })
+  const [playWhack] = useSound(whack, { interrupt: true, soundEnabled });
+  const [playBob] = useSound(bob, { interrupt: true, soundEnabled })
+  const [playDrop, { isPlaying }] = useSound(drop, { interrupt: true, soundEnabled })
 
   const readyForBobSound = useRef(false)
   const soundClock = useRef(new Date().getTime())
@@ -95,13 +95,13 @@ function Scene() {
       }
     }
     
-    // otherwise it plays on load
-    setTimeout(() => {
-      readyForBobSound.current = true
-    }, 4000)
-
-    
-  }, [isPlaying, playBob])
+    // // otherwise it plays on load
+    if (soundEnabled) {
+      setTimeout(() => {
+        readyForBobSound.current = true
+      }, 4000)
+    }
+  }, [isPlaying, playBob, soundEnabled])
 
   return (
     <Physics
