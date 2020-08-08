@@ -5,7 +5,7 @@ import {
   usePlane,
 } from 'use-cannon'
 import useSound from 'use-sound'
-import { HTML } from "drei";
+import { Html } from "drei";
 
 import Rake from './rake'
 import whack from './audio/mp3/whack.mp3'
@@ -113,7 +113,7 @@ function Scene({ soundEnabled }) {
       size={rakeCount * rakeCount + 1}
     >
 
-      <Suspense fallback={<HTML>holup</HTML>}>
+      <Suspense fallback={<Html>holup</Html>}>
 
         {[...Array(rakeCount)].map((_, i) => {
 
