@@ -5,6 +5,7 @@ import {
   usePlane,
 } from 'use-cannon'
 import useSound from 'use-sound'
+import { HTML } from "drei";
 
 import Rake from './rake'
 import whack from './audio/mp3/whack.mp3'
@@ -16,7 +17,7 @@ function randomInteger(min, max) {
 }
 
 function Plane(props) {
-  const SIZE = 32
+  const SIZE = 40
 
   const [ref] = usePlane(() => ({ type: 'Static', ...props }))
   return (
@@ -69,7 +70,7 @@ function Plane(props) {
 
 function Scene({ soundEnabled }) {
 
-  const rakeCount = 5
+  const rakeCount = 6
   const { viewport } = useThree()
 
   const rotations = [
@@ -112,7 +113,7 @@ function Scene({ soundEnabled }) {
       size={rakeCount * rakeCount + 1}
     >
 
-      <Suspense fallback={null}>
+      <Suspense fallback={<HTML>holup</HTML>}>
 
         {[...Array(rakeCount)].map((_, i) => {
 

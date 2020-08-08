@@ -10,6 +10,7 @@ import React, { Suspense, useRef, useState, useEffect, } from 'react'
 import { useLoader, useFrame } from 'react-three-fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { useCompoundBody } from 'use-cannon'
+// import { HTML } from "drei";
 
 import glb from './out.glb'
 
@@ -102,9 +103,9 @@ export default function RakeComponent({ position, rotation, onWhack, onWhackRest
 
   return (
     <group ref={ref}>
-      <Suspense fallback={null}>
+      {/* <Suspense fallback={<HTML>loading</HTML>}> */}
         <Model />
-      </Suspense>
+      {/* </Suspense> */}
 
       {/* <mesh castShadow dispose={null}>
         <boxBufferGeometry attach="geometry" args={handle} />
