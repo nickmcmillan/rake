@@ -17,13 +17,13 @@ function App() {
         concurrent
         colorManagement
         shadowMap
+        invalidateFrameloop
         gl2
-        // pixelRatio={window.devicePixelRatio}
-        // pixelRatio={1}
+        pixelRatio={window.innerWidth > 768 ? 1 : 1.5}
         gl={{
-          powerPreference: "high-performance",
+          // powerPreference: "high-performance",
           alpha: false,
-          antialias: false,
+          // antialias: false,
           stencil: false,
           // depth: false,
         }}
@@ -34,7 +34,6 @@ function App() {
           position: [40, 70, 80],
           zoom: window.innerWidth > 768 ? 55 : 40,
         }}
-        resize={{ scroll: false }}
       >
         
         <ambientLight />
